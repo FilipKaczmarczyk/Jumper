@@ -31,23 +31,10 @@ public class CameraController : MonoBehaviour
             Offset = Target.position - transform.position;
         }
 
-        Pivot.transform.position = Target.transform.position;
+        Pivot.transform.position = Target.transform.position + Vector3.up * 0.7f;
         Pivot.transform.parent = Target.transform;
-        Pivot.transform.position = new Vector3(Pivot.transform.position.x, Pivot.transform.position.y + 0.7f, Pivot.transform.position.z);
 
         Cursor.lockState = CursorLockMode.Locked;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if(Player == null)
-        {
-            return;
-        }
-
-        Vector3 direction = transform.position - Player.transform.position;
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(Player.transform.position + Vector3.up * 1.1f, direction);
     }
 
     void LateUpdate()
@@ -76,27 +63,19 @@ public class CameraController : MonoBehaviour
             {
                 Pivot.rotation = Quaternion.Euler(360.0f + MinLimitAngle, Target.rotation.eulerAngles.y, 0);
             }
-
         }
 
-        float goalEngleX = Pivot.eulerAngles.x;
-        float goalEngleY = Pivot.eulerAngles.y;
-        Quaternion rotation = Quaternion.Euler(goalEngleX, goalEngleY, 0);
+        float goalAngleX = Pivot.eulerAngles.x;
+        float goalAngleY = Pivot.eulerAngles.y;
+        Quaternion rotation = Quaternion.Euler(goalAngleX, goalAngleY, 0);
+
         transform.position = Target.position - (rotation * Offset);
-
-        if (transform.position.y < Target.position.y)
-        {
-            transform.position = new Vector3(transform.position.x, Target.position.y - .5f, transform.position.z);
-        }
 
         Vector3 camOnPlayerPosOffset = Vector3.up * 1.1f;
         Vector3 direction = transform.position - (Player.transform.position + camOnPlayerPosOffset);
 
         if (Physics.Raycast(Player.transform.position + camOnPlayerPosOffset, direction, out RaycastHit hit, direction.magnitude, LayerMask))
-        {
-            Debug.Log(hit);
             transform.position = hit.point;
-        }
 
         transform.LookAt(Pivot);
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    public static Platform instance;
+    public CharacterController CharacterController;
 
     public bool IsCalled = false;
     public int CallingPanel = 0;
@@ -20,16 +20,10 @@ public class Platform : MonoBehaviour
     private bool ready = true;
     private bool moving = false;
 
-    private CharacterController CharacterController;
-
     private Vector3 _currentPos;
 
     public Rigidbody Rigidbody;
 
-    void Awake()
-    {
-        instance = this;
-    }
     void Start()
     {
         _beginPos = Pos[0];
@@ -47,7 +41,7 @@ public class Platform : MonoBehaviour
 
             if (moving)
             {
-                _currentPos = Lerp(_beginPos, _endPos, _timeStartedLerping, _lerpTime);
+                _currentPos = HelperFunctions.Lerp(_beginPos, _endPos, _timeStartedLerping, _lerpTime);
                 Rigidbody.MovePosition(_currentPos);
             }
 
@@ -76,7 +70,6 @@ public class Platform : MonoBehaviour
             _endPos = Pos[CallingPanel];
             IsCalled = false;
         }
-        
     }
     private void StartLerping()
     {
@@ -84,23 +77,6 @@ public class Platform : MonoBehaviour
         _lerpTime = Mathf.Abs(_beginPos.z - _endPos.z) / 3;
         ready = false;
         moving = true;
-    }
-
-    public Vector3 Lerp(Vector3 start, Vector3 end, float timeStartedLerping, float lerpTime = 3.0f)
-    {
-        float timeSinceStarted = Time.time - timeStartedLerping;
-        float percentageComplete = timeSinceStarted / lerpTime;
-        Vector3 result = Vector3.Lerp(start, end, percentageComplete);
-
-        return result;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == "Player")
-        {
-            CharacterController = other.GetComponent<CharacterController>();
-        }
     }
 
     private void OnTriggerStay(Collider other)

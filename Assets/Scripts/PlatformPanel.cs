@@ -4,13 +4,39 @@ using UnityEngine;
 
 public class PlatformPanel : MonoBehaviour
 {
+    public Platform Platform;
+
+    public UIController UI;
+
     public int PanelNumber;
-    private void OnTriggerStay(Collider other)
+
+    public bool UseZone = false;
+    void Update()
     {
-        if (other.gameObject.tag == "Player" && Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && UseZone)
         {
-            Platform.instance.IsCalled = true;
-            Platform.instance.CallingPanel = PanelNumber;
+            Platform.IsCalled = true;
+            Platform.CallingPanel = PanelNumber;
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            UseZone = true;
+        }
+
+        UI.TipText.gameObject.SetActive(true);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            UseZone = false;
+        }
+
+        UI.TipText.gameObject.SetActive(false);
     }
 }

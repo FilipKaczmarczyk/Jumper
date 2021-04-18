@@ -37,8 +37,6 @@ public class Elevator : MonoBehaviour
     {
         if (_isReady)
         {
-            if (havePlayer)
-                UI.ElevatorPanelImage.gameObject.SetActive(false);
             StartLerping();
             SoundManager.PlaySFX(2);
             _isReady = false;
@@ -46,14 +44,15 @@ public class Elevator : MonoBehaviour
 
         if (IsMoving)
         {
-            transform.position = Lerp(_beginPosition, _endPosition, _timeStartedLerping, _lerpTime);
-
+            transform.position = HelperFunctions.Lerp(_beginPosition, _endPosition, _timeStartedLerping, _lerpTime);
+           
             if (transform.position == _endPosition && IsMoving)
             {
                 IsMoving = false;
                 _beginPosition = transform.position;
                 CurrentFloor = _destinationFloor;
                 doors[CurrentFloor].Open();
+               
                 if (havePlayer)
                 {
                     Player.PlayerFloor = CurrentFloor;
@@ -65,10 +64,9 @@ public class Elevator : MonoBehaviour
                     Cursor.lockState = CursorLockMode.Locked;
                 }
             }
-        }
-
-        
+        } 
     }
+
     public void ChooseDestination(int destinationFloor)
     {
         _destinationFloor = destinationFloor;
@@ -79,23 +77,17 @@ public class Elevator : MonoBehaviour
 
         _isReady = true;
     }
+
     private void StartLerping()
     {
         _timeStartedLerping = Time.time;
         IsMoving = true;
+        CurrentFloor = -1;
     }
 
-    public Vector3 Lerp(Vector3 start, Vector3 end, float timeStartedLerping, float lerpTime = 3.0f)
-    {
-        float timeSinceStarted = Time.time - timeStartedLerping;
-        float percentageComplete = timeSinceStarted / lerpTime;
-        Vector3 result = Vector3.Lerp(start, end, percentageComplete);
-
-        return result;
-    }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && !IsMoving)
         {
             doors[CurrentFloor].Close();
             havePlayer = true;

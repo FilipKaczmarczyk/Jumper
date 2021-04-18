@@ -18,6 +18,10 @@ public class SoundManager : MonoBehaviour
         {
             SFX[i].Stop();
         }
+
+        if (SFX.Length <= sfxNumber)
+            return;
+
         SFX[sfxNumber].Play();
     }
 }

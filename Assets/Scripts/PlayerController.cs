@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
 
     public Animator Animator;
 
+    private static int JUMP_ANIM_HASH = Animator.StringToHash("Jump");
+    private static int SPEED_ANIM_HASH = Animator.StringToHash("Speed");
+
     private Vector3 _moveDirection;
 
     public float disToGround;
@@ -28,6 +31,10 @@ public class PlayerController : MonoBehaviour
 
     public bool Freeze = false;
 
+    private float _jumpYPos;
+
+    private float _timer = 0;
+
     void Start()
     {
         UI.JumpText.text = JumpCounter.ToString();
@@ -36,12 +43,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        float vertical = Input.GetAxis("Vertical");
+        float horizontal = Input.GetAxis("Horizontal");
+
         float yDir = _moveDirection.y;
         Vector3 moveDirection = Vector3.zero;
 
         if (!Freeze)
         {
-            moveDirection = (transform.forward * Input.GetAxis("Vertical")) + (transform.right * Input.GetAxis("Horizontal"));
+            moveDirection = (transform.forward * vertical) + (transform.right * horizontal);
         }
 
         moveDirection = moveDirection.normalized * MoveSpeed;
@@ -79,13 +89,24 @@ public class PlayerController : MonoBehaviour
 
         CharacterController.Move((_moveDirection) * Time.deltaTime);
 
-        Animator.SetFloat("Speed", Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal")));
-        Animator.SetBool("Jump", !IsGrounded(transform.position, JumpOffset));
+        Animator.SetFloat(SPEED_ANIM_HASH, Mathf.Abs(vertical) + Mathf.Abs(horizontal));
+        Animator.SetBool(JUMP_ANIM_HASH, !IsGrounded(transform.position, JumpOffset));
 
+        _timer += Time.deltaTime;
+        DisplayTime();
     }
     bool IsGrounded(Vector3 position, float offset)
     {
         return Physics.Raycast(position, Vector3.down, disToGround + offset);
+    }
+    void DisplayTime()
+    {
+        int minutes = Mathf.FloorToInt(_timer / 60F);
+        int seconds = Mathf.FloorToInt(_timer - minutes * 60);
+
+        string displayTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+
+        UI.TimeText.text = displayTime;
     }
 }
 

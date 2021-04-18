@@ -15,43 +15,22 @@ public class UIController : MonoBehaviour
     public Text JumpText;
     public Text FloorText;
     public Text ElevatorText;
+    public Text TimeText;
+    public Text TipText;
 
-    public void Go0()
+    public void Go(int destinationFloor)
     {
         foreach(var elevator in elevators)
         {
             if (elevator.havePlayer)
             {
-                if(elevator.CurrentFloor != 0)
+                if(elevator.CurrentFloor != destinationFloor)
                 {
-                    elevator.ChooseDestination(0);
-                }
-            }
-        }
-    }
-    public void Go1()
-    {
-        foreach (var elevator in elevators)
-        {
-            if (elevator.havePlayer)
-            {
-                if (elevator.CurrentFloor != 1)
-                {
-                    elevator.ChooseDestination(1);
-                }
-            }
-        }
-    }
-
-    public void Go2()
-    {
-        foreach (var elevator in elevators)
-        {
-            if (elevator.havePlayer)
-            {
-                if (elevator.CurrentFloor != 2)
-                {
-                    elevator.ChooseDestination(2);
+                    elevator.ChooseDestination(destinationFloor);
+                    ElevatorPanelImage.gameObject.SetActive(false);
+                    Player.Freeze = false;
+                    MainCamera.Gameplay = true;
+                    Cursor.lockState = CursorLockMode.Locked;
                 }
             }
         }
@@ -61,15 +40,15 @@ public class UIController : MonoBehaviour
     {
         foreach (var elevator in elevators)
         {
-            if (elevator.havePlayer)
-            {
-                elevator.doors[elevator.CurrentFloor].Open();
-                ElevatorPanelImage.gameObject.SetActive(false);
-                elevator.havePlayer = false;
-                Player.Freeze = false;
-                MainCamera.Gameplay = true;
-                Cursor.lockState = CursorLockMode.Locked;
-            }
+            if (!elevator.havePlayer)
+                return;
+
+            elevator.doors[elevator.CurrentFloor].Open();
+            elevator.havePlayer = false;
+            ElevatorPanelImage.gameObject.SetActive(false);
+            Player.Freeze = false;
+            MainCamera.Gameplay = true;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 }
